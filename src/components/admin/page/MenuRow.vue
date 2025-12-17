@@ -5,22 +5,14 @@
                 {{ isExpanded ? '-' : '+' }}
             </button>
         </td>
-
-        <td>
-            <span v-html="prefix"></span>{{ menu.name }}
-        </td>
-
+        <td> <span v-html="prefix"></span>{{ menu.name }}</td>
         <td>{{ menu.path }}</td>
-
         <td><i :class="`fa fa-${menu.icon} mr-2`"></i></td>
-
         <td>{{ menu.sortOrder }}</td>
-
         <td>
             <i class="fa-solid fa-square-check text-success" v-if="menu.isActive"></i>
             <i class="fa-solid fa-circle-xmark text-danger" v-else></i>
         </td>
-
         <td>
             <div class="d-flex justify-content-end">
                 <button class="btn btn-outline-primary btn-circle btn-sm me-2" @click="$emit('edit', menu.id)">
