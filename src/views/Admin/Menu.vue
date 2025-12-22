@@ -12,9 +12,7 @@
                     </span>
                     <span class="text">Thêm mới</span>
                 </a>
-                <!-- <button type="button" class="btn btn-danger" @click="deleteAll(selected)" v-if="selected.length > 0">
-                    <i class="fas fa-trash"></i> Xóa được chọn ({{ selected.length }})
-                </button> -->
+
                 <div class="input-group w-50">
                     <input v-model="keyword" type="text" class="form-control" placeholder="Nhập từ khóa tìm kiếm..." />
                     <button type="button" class="btn btn-info" @click="loadMenus">
@@ -30,59 +28,80 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <!-- <th><input type="checkbox" ref="checkAllRef" v-model="checkAll" /></th> -->
-                            <th>Menu con</th>
-                            <th>Tên menu</th>
-                            <th>path</th>
-                            <th>Icon</th>
-                            <th>Thứ tự</th>
-                            <th>Active</th>
-                            <th class="col-md-2">
+            <div class="card">
+                <TreeTable :value="treeNodes">
+                    <Column field="name" header="Tên menu" expander />
+                    <Column field="path" header="Đường dẫn" />
+                    <Column header="Icon">
+                        <template #body="{ node }">
+                            <i :class="`fa fa-${node.data.icon} mr-2`"></i>
+                        </template>
+                    </Column>
+                    <Column field="sortOrder" header="Thứ tự" />
 
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <MenuRow v-for="menu in menuStore.menus" :key="menu.id" :menu="menu" :expanded="expanded"
-                            @toggle="toggleMenu" @edit="openModal" @delete="deleteMenu"></MenuRow>
-                        <tr v-if="menuStore.menus.length === 0">
-                            <td colspan="7" class="text-center text-muted">Không có dữ liệu</td>
-                        </tr>
-                    </tbody>
-                </table>
+                    <Column header="Active">
+                        <template #body="{ node }">
+                            <i v-if="node.data.isActive" class="fa-solid fa-square-check text-success"></i>
+                            <i v-else class="fa-solid fa-circle-xmark text-danger"></i>
+                        </template>
+                    </Column>
+
+                    <Column header="Action" style="width:10rem">
+                        <template #body="{ node }">
+                            <Button class="btn btn-outline-primary btn-circle btn-sm me-2"
+                                @click="openModal(node.data.id)">
+                                <i class="fas fa-pencil-alt"></i>
+                            </Button>
+                            <Button class="btn btn-outline-danger btn-circle btn-sm" @click="deleteMenu(node.data.id)">
+                                <i class="fa-regular fa-trash-can"></i>
+                            </Button>
+                        </template>
+                    </Column>
+                </TreeTable>
+
             </div>
+
         </div>
     </div>
-
+    <Toast></Toast>
+    <ConfirmDialog></ConfirmDialog>
     <Notification ref="toastRef"></Notification>
+
+
 </template>
 
 <script setup>
 
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import Notification from '@/components/Notification.vue';
 import { useMenuStore } from '@/stores/menu';
-import MenuRow from '@/components/admin/page/MenuRow.vue';
 
+import TreeTable from 'primevue/treetable';
+import Column from 'primevue/column';
+import ConfirmDialog from 'primevue/confirmdialog';
+import { useConfirm } from "primevue/useconfirm";
+import Toast from 'primevue/toast';
+import { useToast } from 'primevue/usetoast';
+
+const confirm = useConfirm();
+const toast = useToast();
 const menuStore = useMenuStore();
-const toastRef = ref(null);
 
 const keyword = ref("");
 
-const expanded = ref([])
+const treeNodes = computed(() =>
+    menuStore.menus.map(mapMenuToNode)
+)
 
-const toggleMenu = (id) => {
-    if (expanded.value.includes(id)) {
-        expanded.value = expanded.value.filter(i => i !== id)
-    } else {
-        expanded.value.push(id)
+function mapMenuToNode(menu) {
+    return {
+        key: menu.id,
+        data: menu,
+        children: menu.children?.map(mapMenuToNode) || []
     }
-};
+}
 
+//
 const loadMenus = async () => {
     await menuStore.getSearch(keyword.value);
 };
@@ -95,13 +114,33 @@ onMounted(() => {
     loadMenus();
 });
 
-const openModal = (user = null) => {
+const openModal = (id = null) => {
+    console.log(id);
     // selectedUser.value = user;
     // userModal.value.open();
 };
 
-const deleteMenu = (id) => {
-
+const deleteMenu = async (id) => {
+    confirm.require({
+        message: 'Bạn có muốn Xóa menu này không?',
+        header: 'Confirmation',
+        icon: 'pi pi-exclamation-triangle',
+        rejectClass: 'p-button-secondary p-button-outlined',
+        rejectLabel: 'Cancel',
+        acceptLabel: 'Xóa',
+        accept: async () => {
+            try {
+                await menuStore.deleteMenu(id);
+                toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Đã xóa Menu vừa chọn', life: 3000 });
+            } catch (err) {
+                toast.add({ severity: 'error', summary: 'Lỗi', detail: `Lỗi : ${menuStore.error}`, life: 3000 });
+            }
+        }
+        //,
+        // reject: () => {            
+        //     toast.add({ severity: 'error', summary: 'Error Message', detail: 'Message Content', life: 3000 });
+        // }
+    });
 }
 
 </script>
@@ -124,5 +163,10 @@ const deleteMenu = (id) => {
 
 .child-row {
     background: #fff;
+}
+
+.tree-prefix {
+    white-space: pre;
+    font-family: monospace;
 }
 </style>

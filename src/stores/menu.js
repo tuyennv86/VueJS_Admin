@@ -56,12 +56,11 @@ export const useMenuStore = defineStore("menu", () => {
   };
 
   const getSearch = async (keyword = "") => {
-    console.log("getSearch keyword =", keyword);
     loading.value = true;
     error.value = null;
     try {
       const data = await menuService.getByKeyword(keyword);
-      console.log("API data =", data);
+      //console.log("API data =", data);
       menus.value = data;
     } catch (error) {
       error.value = error.message;
@@ -96,6 +95,24 @@ export const useMenuStore = defineStore("menu", () => {
     }
   };
 
+  const deleteMenu = async (id) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await menuService.deleteMenu(id);
+      menus.value = removeById(menus.value, id);
+    } catch (error) {}
+  };
+
+  function removeById(list, idToRemove) {
+    return list
+      .filter((item) => item.id !== idToRemove)
+      .map((item) => ({
+        ...item,
+        children: item.children ? removeById(item.children, idToRemove) : [],
+      }));
+  }
+
   return {
     menus,
     usermenus,
@@ -108,5 +125,6 @@ export const useMenuStore = defineStore("menu", () => {
     getSearch,
     insertMenu,
     updateMenu,
+    deleteMenu,
   };
 });
