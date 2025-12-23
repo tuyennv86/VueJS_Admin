@@ -79,8 +79,8 @@ import { useMenuStore } from '@/stores/menu';
 import TreeTable from 'primevue/treetable';
 import Column from 'primevue/column';
 import ConfirmDialog from 'primevue/confirmdialog';
-import { useConfirm } from "primevue/useconfirm";
 import Toast from 'primevue/toast';
+import { useConfirm } from "primevue/useconfirm";
 import { useToast } from 'primevue/usetoast';
 
 const confirm = useConfirm();
