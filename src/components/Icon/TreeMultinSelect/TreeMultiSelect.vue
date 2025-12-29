@@ -14,7 +14,11 @@
             <span v-if="hiddenCount" class="text-muted small">
                 + {{ hiddenCount }} mục
             </span>
+            <!-- <div class="flex right align last item">
+                <span>▾</span>
+            </div> -->
         </div>
+
 
         <!-- DROPDOWN -->
         <div v-if="open" class="dropdown-menu show w-100 shadow-sm p-0 mt-1" @click.stop>
