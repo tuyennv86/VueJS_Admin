@@ -5,6 +5,9 @@ import { ref } from "vue";
 export const useMenuStore = defineStore("menu", () => {
   const menus = ref([]);
   const usermenus = ref([]);
+  const menuOthers = ref([]);
+  const menu = ref(null);
+
   const loading = ref(false);
   const error = ref(null);
 
@@ -15,7 +18,6 @@ export const useMenuStore = defineStore("menu", () => {
       const data = await menuService.getMenusByUser();
       usermenus.value = data;
     } catch (error) {
-      // console.error("Lỗi tải menu:", error.message);
       error.value = error.message;
     } finally {
       loading.value = false;
@@ -48,7 +50,6 @@ export const useMenuStore = defineStore("menu", () => {
       const data = await menuService.getMenus();
       menus.value = data;
     } catch (error) {
-      // console.error("Lỗi tải menu:", error.message);
       error.value = error.message;
     } finally {
       loading.value = false;
@@ -60,7 +61,6 @@ export const useMenuStore = defineStore("menu", () => {
     error.value = null;
     try {
       const data = await menuService.getByKeyword(keyword);
-      //console.log("API data =", data);
       menus.value = data;
     } catch (error) {
       error.value = error.message;
@@ -68,6 +68,35 @@ export const useMenuStore = defineStore("menu", () => {
       loading.value = false;
     }
   };
+
+  const getothers = async (id) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await menuService.getothers(id);
+      menuOthers.value = data;
+      return data;
+    } catch (error) {
+      error.value = error.message;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const getById = async (id) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await menuService.getById(id);
+      menu.value = data;
+      return data;
+    } catch (error) {
+      error.value = error.message;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const insertMenu = async (menu) => {
     loading.value = true;
     error.value = null;
@@ -115,6 +144,8 @@ export const useMenuStore = defineStore("menu", () => {
 
   return {
     menus,
+    menu,
+    menuOthers,
     usermenus,
     loading,
     error,
@@ -123,6 +154,8 @@ export const useMenuStore = defineStore("menu", () => {
     getMyMenus,
     getMenusByUser,
     getSearch,
+    getById,
+    getothers,
     insertMenu,
     updateMenu,
     deleteMenu,

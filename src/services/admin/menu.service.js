@@ -22,8 +22,17 @@ const getByKeyword = async (keyword) => {
   return response.data;
 };
 
+const getothers = async (id) => {
+  const response = await api.get(`/menus/others/${id}`);
+  return response.data;
+};
+const getById = async (id) => {
+  const response = await api.get(`/menus/${id}`);
+  return response.data;
+};
+
 const insertMenu = async (menu) => {
-  const response = await api.post("/menus/", menu);
+  const response = await api.post("/menus", menu);
   return response.data;
 };
 
@@ -42,6 +51,8 @@ export default {
   getMyMenus,
   getMenus,
   getByKeyword,
+  getothers,
+  getById,
   insertMenu,
   updateMenu,
   deleteMenu,

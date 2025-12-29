@@ -6,7 +6,7 @@
     <div class="card shadow mb-4">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <a href="#" class="btn btn-success btn-icon-split" @click="openModal()">
+                <a href="#" class="btn btn-success btn-icon-split" @click="openModal(null)">
                     <span class="icon text-white-50">
                         <i class="fas fa-plus-square"></i>
                     </span>
@@ -34,7 +34,7 @@
                     <Column field="path" header="Đường dẫn" />
                     <Column header="Icon">
                         <template #body="{ node }">
-                            <i :class="`fa fa-${node.data.icon} mr-2`"></i>
+                            <i :class="`${node.data.icon} mr-2`"></i>
                         </template>
                     </Column>
                     <Column field="sortOrder" header="Thứ tự" />
@@ -65,29 +65,70 @@
     </div>
     <Toast></Toast>
     <ConfirmDialog></ConfirmDialog>
-    <Notification ref="toastRef"></Notification>
 
-
+    <MenuFormDialog ref="menuModal" :menu="selectedMenu" :menusOther="menuStore.menus"
+        :permissions="permissionStore.permissions" @save="onSave">
+    </MenuFormDialog>
 </template>
 
 <script setup>
 
 import { onMounted, ref, watch, computed } from 'vue';
-import Notification from '@/components/Notification.vue';
 import { useMenuStore } from '@/stores/menu';
+import { usePermissionStore } from '@/stores/permission';
+import { TreeTable, Column, ConfirmDialog, Toast } from 'primevue';
+import MenuFormDialog from '@/components/admin/page/MenuFormDialog.vue';
 
-import TreeTable from 'primevue/treetable';
-import Column from 'primevue/column';
-import ConfirmDialog from 'primevue/confirmdialog';
-import Toast from 'primevue/toast';
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from 'primevue/usetoast';
 
 const confirm = useConfirm();
 const toast = useToast();
 const menuStore = useMenuStore();
+const permissionStore = usePermissionStore();
 
 const keyword = ref("");
+
+const menuModal = ref(null);
+const selectedMenu = ref(null);
+
+const openModal = async (id) => {
+    if (id !== null) {
+        selectedMenu.value = await menuStore.getById(id);
+    }
+    else {
+        selectedMenu.value = null;
+    }
+    await getMenuOther();
+    await getPermission();
+    menuModal.value.open();
+};
+
+const getMenuOther = async () => {
+    await menuStore.getMenus();
+}
+
+const getPermission = async () => {
+    await permissionStore.getAllPermission();
+}
+
+const onSave = async ({ form, isEdit }) => {
+    try {
+        if (isEdit) {
+            await menuStore.updateMenu(form.id, form);
+            toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Cập nhật menu thành công!', life: 3000 });
+
+        } else {
+            await menuStore.insertMenu(form);
+            toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Thêm mới menu thành công!', life: 3000 });
+        }
+    } catch (error) {
+        toast.add({ severity: 'error', summary: 'Lỗi', detail: `Lỗi : ${menuStore.error} - ${error}`, life: 3000 });
+    }
+
+
+    // visible.value = false
+}
 
 const treeNodes = computed(() =>
     menuStore.menus.map(mapMenuToNode)
@@ -110,15 +151,9 @@ watch(keyword, () => {
     loadMenus();
 });
 
-onMounted(() => {
-    loadMenus();
+onMounted(async () => {
+    await loadMenus();
 });
-
-const openModal = (id = null) => {
-    console.log(id);
-    // selectedUser.value = user;
-    // userModal.value.open();
-};
 
 const deleteMenu = async (id) => {
     confirm.require({

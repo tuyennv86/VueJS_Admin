@@ -2,7 +2,7 @@
     <hr class="sidebar-divider" />
     <li class="nav-item">
         <router-link :to="`/admin${menu.path}`" class="nav-link">
-            <i :class="`fa fa-${menu.icon} mr-2`"></i>
+            <i :class="`${menu.icon} mr-2`"></i>
             <span>{{ menu.name }}</span>
         </router-link>
 

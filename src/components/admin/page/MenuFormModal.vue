@@ -21,11 +21,15 @@
                         </div>
                         <!-- Order -->
                         <div class="mb-3">
-                            <select v-model="form.parentId" class="form-select" required>
+                            <!-- <select v-model="form.parentId" class="form-select" required>
                                 <option v-for="menu in menusOther" :key="menu.id" :value="menu.id">
                                     {{ menu.name }}
                                 </option>
-                            </select>
+                            </select> -->
+                            <TreeSelect v-if="treeData && treeData.length > 0" v-model="selectedParent"
+                                :options="treeData" placeholder="Chọn menu cha" class="w-full" selectionMode="single"
+                                :showClear="true" />
+                            <pre>{{ treeData }}</pre>
                         </div>
                         <!-- path -->
                         <div class="mb-3">
@@ -68,13 +72,37 @@
 <script setup>
 import { reactive, computed, ref, watch, onMounted } from "vue";
 import * as bootstrap from "bootstrap";
+import TreeSelect from "primevue/treeselect";
+
+const selectedParent = ref(null)
 
 const props = defineProps({
     menu: Object,
-    menusOther: Array
+    menusOther: {
+        type: Array,
+        default: () => []
+    }
 });
 
 const emits = defineEmits(["save"]);
+
+const treeData = computed(() => {
+    if (!props.menusOther.length) return []
+    return mapMenuToTreeNode(props.menusOther)
+})
+//Không cho chọn chính nó
+function mapMenuToTreeNode(menus) {
+    return menus
+        .filter(m => m.id !== form.id)
+        .map(menu => ({
+            key: menu.id.toString(),
+            label: menu.name,
+            selectable: menu.id !== form.id,
+            children: menu.children?.length
+                ? mapMenuToTreeNode(menu.children)
+                : []
+        }))
+}
 
 // FORM
 const form = reactive({
@@ -97,21 +125,22 @@ const resetForm = () => {
         sortOrder: 0,
         isActive: false
     });
+    selectedParent.value = null;
 };
 
 // Load data khi mở modal
 watch(() => props.menu,
-    (u) => {
+    (m) => {
         if (m) {
             Object.assign(form, {
                 id: m.id,
-                name: u.name,
-                path: u.path,
-                icon: u.icon,
-                parentId: m.parentId,
+                name: m.name,
+                path: m.path,
+                icon: m.icon,
                 sortOrder: m.sortOrder,
-                isActive: u.isActive
+                isActive: m.isActive
             });
+            selectedParent.value = m.parentId ? m.parentId.toString() : null
         } else {
             resetForm();
         }
@@ -130,10 +159,15 @@ onMounted(() => {
 });
 
 const open = () => bsModal.show();
-const close = () => bsModal.hide();
+const close = () => {
+    bsModal.hide();
+    document.activeElement?.blur();
+    bsModal.hide();
+}
 
 // Lưu người dùng
 const save = () => {
+    form.parentId = selectedParent.value ? Number(selectedParent.value) : null;
     emits("save", {
         form: { ...form }
     });
@@ -144,3 +178,8 @@ const save = () => {
 
 defineExpose({ open, close });
 </script>
+<style scoped>
+.p-treeselect {
+    width: 100%;
+}
+</style>

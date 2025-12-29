@@ -120,7 +120,6 @@ watch(selected, () => {
 const openModal = async (id = null) => {
     if (id !== null) {
         selectedRole.value = await roleStore.getById(id);
-        //selectedRole.value = roleStore.role;
     } else {
         selectedRole.value = null;
     }
