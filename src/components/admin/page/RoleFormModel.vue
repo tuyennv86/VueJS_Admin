@@ -34,12 +34,6 @@
                         <!-- Premissions -->
                         <div class="mb-3">
                             <label class="form-label">Quyền</label>
-                            <!-- <select v-model="form.permissionIds" multiple class="form-select" required>
-                                <option v-for="permission in permissions" :key="permission.id" :value="permission.id">
-                                    {{ permission.name }}
-                                </option>
-                            </select>
-                            <small class="text-muted">Giữ Ctrl để chọn nhiều thành phần</small> -->
                             <MultiSelectDropdown v-model="form.permissionIds" :options="permissions" optionLabel="name"
                                 optionValue="id">
                             </MultiSelectDropdown>

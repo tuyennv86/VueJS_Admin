@@ -1,22 +1,31 @@
 <template>
     <div ref="wrapperRef" class="position-relative w-100">
-        <!-- SELECTED FILES -->
-        <div class="form-control d-flex flex-wrap gap-1 align-items-center" style="min-height: 40px; cursor: pointer"
-            @click.stop="toggleDropdown">
-            <template v-for="item in visibleTags" :key="item.id">
-                <span class="drive-chip">
-                    <i :class="item.icon"></i>
-                    <span class="ms-1">{{ item.label }}</span>
-                    <span class="ms-1 chip-close" @click.stop="remove(item.id)">×</span>
-                </span>
-            </template>
 
-            <span v-if="hiddenCount" class="text-muted small">
-                + {{ hiddenCount }} mục
-            </span>
-            <!-- <div class="flex right align last item">
+        <!-- SELECTED FILES -->
+        <div class="form-control d-flex align-items-center justify-content-between drive-select"
+            @click.stop="toggleDropdown">
+            <!-- LEFT: TAGS -->
+            <div class="d-flex flex-wrap gap-1 align-items-center flex-grow-1">
+                <template v-for="item in visibleTags" :key="item.id">
+                    <span class="drive-chip">
+                        <i :class="item.icon"></i>
+                        <span class="ms-1">{{ item.label }}</span>
+                        <span class="ms-1 chip-close" @click.stop="remove(item.id)">×</span>
+                    </span>
+                </template>
+
+                <span v-if="hiddenCount" class="text-muted small">
+                    + {{ hiddenCount }} mục
+                </span>
+            </div>
+
+            <!-- RIGHT ICONS -->
+            <div class="drive-actions d-flex align-items-center gap-2">
+                <!-- CLEAR -->
+                <span class="ms-1 chip-close" @click.stop="clearAll">×</span>
+                <!-- CARET -->
                 <span>▾</span>
-            </div> -->
+            </div>
         </div>
 
 
@@ -140,6 +149,12 @@ const update = (v) => emit('update:modelValue', v)
 const remove = (id) =>
     emit('update:modelValue', props.modelValue.filter(i => i !== id))
 const clear = () => emit('update:modelValue', [])
+
+const clearAll = () => {
+    emit('update:modelValue', [])
+}
+
+
 </script>
 
 <style scoped>
@@ -159,5 +174,39 @@ const clear = () => emit('update:modelValue', [])
 
 .cursor-pointer {
     cursor: pointer;
+}
+
+.drive-select {
+    min-height: 40px;
+    cursor: pointer;
+    padding-right: 8px;
+}
+
+/* RIGHT ICON CONTAINER */
+.drive-actions {
+    border-left: 1px solid #e0e0e0;
+    padding-left: 8px;
+}
+
+/* CLEAR */
+.drive-clear {
+    font-size: 16px;
+    color: #5f6368;
+    cursor: pointer;
+}
+
+.drive-clear:hover {
+    color: #d93025;
+}
+
+/* CARET */
+.drive-caret {
+    font-size: 14px;
+    color: #5f6368;
+    transition: transform 0.2s ease;
+}
+
+.drive-caret.open {
+    transform: rotate(180deg);
 }
 </style>

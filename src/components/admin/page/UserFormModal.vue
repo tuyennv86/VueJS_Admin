@@ -60,12 +60,15 @@
                         <!-- ROLES -->
                         <div class="mb-3">
                             <label class="form-label">Vai trò</label>
-                            <select v-model="form.roleIds" multiple class="form-select" required>
+                            <!-- <select v-model="form.roleIds" multiple class="form-select" required>
                                 <option v-for="role in roles" :key="role.id" :value="role.id">
                                     {{ role.name }}
                                 </option>
                             </select>
-                            <small class="text-muted">Giữ Ctrl để chọn nhiều thành phần</small>
+                            <small class="text-muted">Giữ Ctrl để chọn nhiều thành phần</small> -->
+                            <MultiSelectDropdown v-model="form.roleIds" :options="roles" optionLabel="name"
+                                optionValue="id">
+                            </MultiSelectDropdown>
                         </div>
 
                         <!-- ACTIVE -->
@@ -91,6 +94,7 @@
 <script setup>
 import { reactive, computed, ref, watch, onMounted } from "vue";
 import * as bootstrap from "bootstrap";
+import MultiSelectDropdown from "@/components/Icon/MultiSelectDropdown.vue";
 
 const props = defineProps({
     user: Object,

@@ -11,19 +11,15 @@
 
             <!-- PARENT MENU -->
             <div class="mb-3">
-                <TreeTable v-if="treeTableData.length" :value="treeTableData" selectionMode="single"
-                    v-model:selectionKeys="selectedKey" class="p-treetable-sm border">
-                    <Column field="name" header="Tên menu" expander />
-                </TreeTable>
-                <small class="text-muted">
-                    Click 1 dòng để chọn menu cha (để trống = menu gốc)
-                </small>
+                <label class="form-label">Menu cha</label>
+                <TreeSelect v-model="form.parentId" :options="menusOther" optionLabel="name" optionValue="id"
+                    placeholder="Chọn menu cha" />
             </div>
             <!-- Permission -->
             <div class="mb-3 w-full">
                 <label class="form-label">Quyền</label>
-                <MultiSelect v-model="form.permissionIds" :options="permissions" optionLabel="name" optionValue="id"
-                    placeholder="Chọn quyền" class="permission-select" />
+                <MultiSelectDropdown v-model="form.permissionIds" :options="permissions" optionLabel="name"
+                    optionValue="id" placeholder="Chọn quyền"></MultiSelectDropdown>
             </div>
             <!-- PATH -->
             <div class="mb-3">
@@ -66,10 +62,9 @@
 <script setup>
 import { ref, reactive, computed, watch, nextTick } from "vue";
 import Dialog from "primevue/dialog";
-import TreeTable from "primevue/treetable";
-import Column from "primevue/column";
 import IconPicker from "@/components/Icon/IconPicker.vue";
-import MultiSelect from 'primevue/multiselect';
+import MultiSelectDropdown from "@/components/Icon/MultiSelectDropdown.vue";
+import TreeSelect from "@/components/Icon/TreeSelect/TreeSelect.vue";
 
 
 const visible = ref(false);
@@ -121,35 +116,10 @@ const onShow = async () => {
     nameInput.value?.focus();
 };
 
-// =======================
-// TREE TABLE DATA
-// =======================
-const treeTableData = computed(() =>
-    buildTreeTable(props.menusOther)
-);
-
-//Không cho chọn chính nó
-function buildTreeTable(menus) {
-    return menus
-        .filter(m => m.id !== form.id)
-        .map(menu => ({
-            key: menu.id.toString(),
-            data: {
-                id: menu.id,
-                name: menu.name
-            },
-            children: menu.children?.length ? buildTreeTable(menu.children) : []
-        }));
-}
-
-// =======================
-// LOAD EDIT DATA
-// =======================
 watch(() => props.menu,
     m => {
         if (!m) {
-            resetForm();                 // QUAN TRỌNG
-            selectedKey.value = {};      // reset menu cha
+            resetForm();
             return;
         }
 
@@ -163,9 +133,6 @@ watch(() => props.menu,
             isActive: m.isActive,
             permissionIds: m.permissions ? m.permissions.map(p => p.id) : []
         });
-
-        // Highlight menu cha
-        selectedKey.value = m.parentId ? { [m.parentId]: true } : {};
     },
     { immediate: true }
 );
