@@ -28,13 +28,8 @@
 
                         <!-- menus -->
                         <div class="mb-3">
-                            <label class="form-label">Menu</label>
-                            <select v-model="form.menuIds" multiple class="form-select" required>
-                                <option v-for="menu in menus" :key="menu.id" :value="menu.id">
-                                    {{ menu.name }}
-                                </option>
-                            </select>
-                            <small class="text-muted">Giữ Ctrl để chọn nhiều thành phần</small>
+                            <label class="form-label">Chọn menus</label>
+                            <TreeMultiSelect v-model="form.menuIds" :options="treeTableData" placeholder="Chọn menus" />
                         </div>
                         <!-- Premissions -->
                         <div class="mb-3">
@@ -64,12 +59,30 @@
 <script setup>
 import { reactive, computed, ref, watch, onMounted } from "vue";
 import * as bootstrap from "bootstrap";
+import TreeMultiSelect from "@/components/Icon/TreeMultinSelect/TreeMultiSelect.vue";
 
 const props = defineProps({
     role: Object,
     menus: Array,
     permissions: Array
 });
+const selectedIds = ref([]);
+// =======================
+// TREE TABLE DATA
+// =======================
+const treeTableData = computed(() =>
+    buildTreeTable(props.menus)
+);
+
+//Không cho chọn chính nó
+function buildTreeTable(menus) {
+    return menus
+        .map(menu => ({
+            id: menu.id,
+            label: menu.name,
+            children: menu.children?.length ? buildTreeTable(menu.children) : []
+        }));
+}
 
 const emits = defineEmits(["save"]);
 

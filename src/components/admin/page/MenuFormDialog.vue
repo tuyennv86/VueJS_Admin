@@ -15,7 +15,6 @@
                     v-model:selectionKeys="selectedKey" class="p-treetable-sm border">
                     <Column field="name" header="Tên menu" expander />
                 </TreeTable>
-
                 <small class="text-muted">
                     Click 1 dòng để chọn menu cha (để trống = menu gốc)
                 </small>
@@ -71,6 +70,7 @@ import TreeTable from "primevue/treetable";
 import Column from "primevue/column";
 import IconPicker from "@/components/Icon/IconPicker.vue";
 import MultiSelect from 'primevue/multiselect';
+
 
 const visible = ref(false);
 const selectedKey = ref({});
@@ -128,7 +128,7 @@ const treeTableData = computed(() =>
     buildTreeTable(props.menusOther)
 );
 
-// Không cho chọn chính nó
+//Không cho chọn chính nó
 function buildTreeTable(menus) {
     return menus
         .filter(m => m.id !== form.id)
