@@ -58,7 +58,8 @@
                         </template>
                     </Column>
                 </TreeTable>
-
+                <!-- <TreeTable :data="menuStore.menus"></TreeTable> -->
+                <UserTreeTable :data="menuStore.menus"></UserTreeTable>
             </div>
 
         </div>
@@ -81,6 +82,7 @@ import MenuFormDialog from '@/components/admin/page/MenuFormDialog.vue';
 
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from 'primevue/usetoast';
+import UserTreeTable from '@/components/Icon/UserTreeTable/UserTreeTable.vue';
 
 const confirm = useConfirm();
 const toast = useToast();
