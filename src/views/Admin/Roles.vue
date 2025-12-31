@@ -74,7 +74,7 @@
 </template>
 <script setup>
 import Pagination from '@/components/admin/Pagination.vue';
-import Notification from '@/components/Notification.vue';
+import Notification from '@/composable/Notification.vue';
 import RoleFormModel from '@/components/admin/page/RoleFormModel.vue';
 import { useRoleStore } from '@/stores/role';
 import { usePermissionStore } from '@/stores/permission';

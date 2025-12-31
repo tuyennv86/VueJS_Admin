@@ -99,7 +99,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useRoleStore } from '@/stores/role';
 import UserFormModal from '@/components/admin/page/UserFormModal.vue';
-import Notification from '@/components/Notification.vue';
+import Notification from '@/composable/Notification.vue';
 
 const userStore = useUserStore();
 const roleStore = useRoleStore();

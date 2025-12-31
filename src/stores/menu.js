@@ -1,6 +1,12 @@
 import { defineStore } from "pinia";
 import menuService from "@/services/admin/menu.service";
 import { ref } from "vue";
+import {
+  addMenuToTree,
+  removeMenuFromTree,
+  updateMenuInTree,
+  upsertMenuTree,
+} from "@/utils/menuTree";
 
 export const useMenuStore = defineStore("menu", () => {
   const menus = ref([]);
@@ -36,12 +42,6 @@ export const useMenuStore = defineStore("menu", () => {
       loading.value = false;
     }
   };
-  const resetMenu = () => {
-    menus.value = [];
-    usermenus.value = [];
-    loading.value = false;
-    error.value = null;
-  };
 
   const getMenus = async () => {
     loading.value = true;
@@ -75,7 +75,7 @@ export const useMenuStore = defineStore("menu", () => {
     try {
       const data = await menuService.getothers(id);
       menuOthers.value = data;
-      return data;
+      // return data;
     } catch (error) {
       error.value = error.message;
     } finally {
@@ -102,7 +102,7 @@ export const useMenuStore = defineStore("menu", () => {
     error.value = null;
     try {
       const data = await menuService.insertMenu(menu);
-      menus.value.push(data);
+      addMenuToTree(menus.value, data);
     } catch (error) {
       error.value = error.message;
     } finally {
@@ -115,8 +115,7 @@ export const useMenuStore = defineStore("menu", () => {
     error.value = null;
     try {
       const data = await menuService.updateMenu(id, menu);
-      menus.value = menus.value.filter((m) => m.id !== id);
-      menus.value.unshift(data);
+      updateMenuInTree(menus.value, data);
     } catch (error) {
       error.value = error.message;
     } finally {
@@ -129,18 +128,13 @@ export const useMenuStore = defineStore("menu", () => {
     error.value = null;
     try {
       const data = await menuService.deleteMenu(id);
-      menus.value = removeById(menus.value, id);
-    } catch (error) {}
+      removeMenuFromTree(menus.value, id);
+    } catch (error) {
+      error.value = error.message;
+    } finally {
+      loading.value = false;
+    }
   };
-
-  function removeById(list, idToRemove) {
-    return list
-      .filter((item) => item.id !== idToRemove)
-      .map((item) => ({
-        ...item,
-        children: item.children ? removeById(item.children, idToRemove) : [],
-      }));
-  }
 
   return {
     menus,
@@ -149,7 +143,6 @@ export const useMenuStore = defineStore("menu", () => {
     usermenus,
     loading,
     error,
-    resetMenu,
     getMenus,
     getMyMenus,
     getMenusByUser,

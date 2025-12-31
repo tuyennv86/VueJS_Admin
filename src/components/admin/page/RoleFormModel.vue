@@ -29,7 +29,8 @@
                         <!-- menus -->
                         <div class="mb-3">
                             <label class="form-label">Chọn menus</label>
-                            <TreeMultiSelect v-model="form.menuIds" :options="treeTableData" placeholder="Chọn menus" />
+                            <TreeMultiSelect v-model="form.menuIds" :options="menus" optionLabel="name" optionValue="id"
+                                placeholder="Chọn menus" />
                         </div>
                         <!-- Premissions -->
                         <div class="mb-3">
@@ -56,31 +57,14 @@
 <script setup>
 import { reactive, computed, ref, watch, onMounted } from "vue";
 import * as bootstrap from "bootstrap";
-import TreeMultiSelect from "@/components/Icon/TreeMultinSelect/TreeMultiSelect.vue";
-import MultiSelectDropdown from "@/components/Icon/MultiSelectDropdown.vue";
+import TreeMultiSelect from "@/composable/TreeMultinSelect/TreeMultiSelect.vue";
+import MultiSelectDropdown from "@/composable/MultiSelectDropdown.vue";
 
 const props = defineProps({
     role: Object,
     menus: Array,
     permissions: Array
 });
-const selectedIds = ref([]);
-// =======================
-// TREE TABLE DATA
-// =======================
-const treeTableData = computed(() =>
-    buildTreeTable(props.menus)
-);
-
-//Không cho chọn chính nó
-function buildTreeTable(menus) {
-    return menus
-        .map(menu => ({
-            id: menu.id,
-            label: menu.name,
-            children: menu.children?.length ? buildTreeTable(menu.children) : []
-        }));
-}
 
 const emits = defineEmits(["save"]);
 

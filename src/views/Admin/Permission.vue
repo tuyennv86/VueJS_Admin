@@ -74,7 +74,7 @@
 </template>
 <script setup>
 import Pagination from '@/components/admin/Pagination.vue';
-import Notification from '@/components/Notification.vue';
+import Notification from '@/composable/Notification.vue';
 import PermissionModel from '@/components/admin/page/PermissionModel.vue';
 import { usePermissionStore } from '@/stores/permission';
 import { computed, onMounted, ref, watch } from 'vue';

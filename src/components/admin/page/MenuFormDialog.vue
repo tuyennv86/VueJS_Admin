@@ -1,75 +1,95 @@
 <template>
-    <Dialog v-model:visible="visible" modal :style="{ width: '650px' }" :header="isEdit ? 'Cập nhật menu' : 'Thêm menu'"
-        @show="onShow">
-        <form @submit.prevent="save">
+    <!-- <Dialog v-model:visible="visible" modal :style="{ width: '650px' }" :header="isEdit ? 'Cập nhật menu' : 'Thêm menu'"
+        @show="onShow"> -->
+    <div class="modal fade" id="menuModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false" ref="modalRef">
+        <div class="modal-dialog">
+            <div class="modal-content">
 
-            <!-- NAME -->
-            <div class="mb-3">
-                <label class="form-label">Tên menu</label>
-                <input ref="nameInput" v-model="form.name" type="text" class="form-control" required />
-            </div>
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        {{ isEdit ? "Cập nhật vài trò" : "Thêm vai trò" }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form @submit.prevent="save">
+                    <div class="modal-body">
+                        <!-- NAME -->
+                        <div class="mb-3">
+                            <label class="form-label">Tên menu</label>
+                            <input ref="nameInput" v-model="form.name" type="text" class="form-control" required />
+                        </div>
 
-            <!-- PARENT MENU -->
-            <div class="mb-3">
-                <label class="form-label">Menu cha</label>
-                <TreeSelect v-model="form.parentId" :options="menusOther" optionLabel="name" optionValue="id"
-                    placeholder="Chọn menu cha" />
-            </div>
-            <!-- Permission -->
-            <div class="mb-3 w-full">
-                <label class="form-label">Quyền</label>
-                <MultiSelectDropdown v-model="form.permissionIds" :options="permissions" optionLabel="name"
-                    optionValue="id" placeholder="Chọn quyền"></MultiSelectDropdown>
-            </div>
-            <!-- PATH -->
-            <div class="mb-3">
-                <label class="form-label">Đường dẫn</label>
-                <input v-model="form.path" class="form-control" />
-            </div>
+                        <!-- PARENT MENU -->
+                        <div class="mb-3">
+                            <label class="form-label">Menu cha</label>
+                            <TreeSelect v-model="form.parentId" :options="menusOther" optionLabel="name"
+                                optionValue="id" placeholder="Chọn menu cha" />
+                        </div>
+                        <!-- Permission -->
+                        <div class="mb-3 w-full">
+                            <label class="form-label">Quyền</label>
+                            <MultiSelectDropdown v-model="form.permissionIds" :options="permissions" optionLabel="name"
+                                optionValue="id" placeholder="Chọn quyền"></MultiSelectDropdown>
+                        </div>
+                        <!-- PATH -->
+                        <div class="mb-3">
+                            <label class="form-label">Đường dẫn</label>
+                            <input v-model="form.path" class="form-control" />
+                        </div>
 
-            <!-- ICON -->
-            <div class="mb-3">
-                <label class="form-label">Icon</label>
-                <input v-model="form.icon" class="form-control" />
-                <IconPicker v-model="form.icon" />
-            </div>
+                        <!-- ICON -->
+                        <div class="mb-3">
+                            <label class="form-label">Icon</label>
+                            <input v-model="form.icon" class="form-control" />
+                            <IconPicker v-model="form.icon" />
+                        </div>
 
-            <!-- ORDER -->
-            <div class="mb-3">
-                <label class="form-label">Thứ tự</label>
-                <input v-model="form.sortOrder" type="number" class="form-control" />
-            </div>
+                        <!-- ORDER -->
+                        <div class="mb-3">
+                            <label class="form-label">Thứ tự</label>
+                            <input v-model="form.sortOrder" type="number" class="form-control" />
+                        </div>
 
-            <!-- ACTIVE -->
-            <div class="form-check mb-3">
-                <input v-model="form.isActive" type="checkbox" class="form-check-input" />
-                <label class="form-check-label">Kích hoạt</label>
-            </div>
+                        <!-- ACTIVE -->
+                        <div class="form-check mb-3">
+                            <input v-model="form.isActive" type="checkbox" class="form-check-input" />
+                            <label class="form-check-label">Kích hoạt</label>
+                        </div>
 
-            <!-- FOOTER -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" @click="close">
-                    Hủy
-                </button>
-                <button type="submit" class="btn btn-primary">
-                    {{ isEdit ? "Lưu" : "Thêm mới" }}
-                </button>
+                        <!-- FOOTER -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @click="close">
+                                Hủy
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                {{ isEdit ? "Lưu" : "Thêm mới" }}
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
-
-        </form>
-    </Dialog>
+        </div>
+    </div>
+    <!-- </Dialog> -->
 </template>
 <script setup>
-import { ref, reactive, computed, watch, nextTick } from "vue";
-import Dialog from "primevue/dialog";
-import IconPicker from "@/components/Icon/IconPicker.vue";
-import MultiSelectDropdown from "@/components/Icon/MultiSelectDropdown.vue";
-import TreeSelect from "@/components/Icon/TreeSelect/TreeSelect.vue";
+import { ref, reactive, computed, watch, onMounted } from "vue";
+import * as bootstrap from "bootstrap";
+import IconPicker from "@/composable/IconPicker.vue";
+import MultiSelectDropdown from "@/composable/MultiSelectDropdown.vue";
+import TreeSelect from "@/composable/TreeSelect/TreeSelect.vue";
 
 
-const visible = ref(false);
-const selectedKey = ref({});
-const nameInput = ref(null);
+const modalRef = ref(null);
+let bsModal = null;
+onMounted(() => {
+    bsModal = new bootstrap.Modal(modalRef.value);
+});
+
+const open = () => bsModal.show();
+const close = () => { resetForm(); bsModal.hide(); }
+
 
 const props = defineProps({
     menu: Object,
@@ -110,12 +130,6 @@ const resetForm = () => {
     });
 };
 
-// Focus khi mở dialog
-const onShow = async () => {
-    await nextTick();
-    nameInput.value?.focus();
-};
-
 watch(() => props.menu,
     m => {
         if (!m) {
@@ -137,22 +151,8 @@ watch(() => props.menu,
     { immediate: true }
 );
 const isEdit = computed(() => !!props.menu);
-// =======================
-// OPEN / CLOSE
-// =======================
-const open = () => (visible.value = true);
-const close = () => {
-    resetForm();
-    selectedKey.value = {};
-    visible.value = false;
-};
 
-// =======================
-// SAVE
-// =======================
 const save = () => {
-    const key = Object.keys(selectedKey.value)[0];
-    form.parentId = key ? Number(key) : null;
 
     emit("save", {
         form: { ...form },

@@ -26,12 +26,13 @@ defineProps({
         required: true
     }
 })
+const emit = defineEmits(['edit', 'delete'])
 
 const edit = (row) => {
-    console.log('Edit', row)
+    emit('edit', row);
 }
 
 const remove = (row) => {
-    console.log('Delete', row)
+    emit('delete', row);
 }
 </script>
