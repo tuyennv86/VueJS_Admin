@@ -45,6 +45,10 @@ const deleteMenu = async (id) => {
   const response = await api.delete(`/menus/${id}`);
   return response.data;
 };
+const changIsActive = async (id) => {
+  const response = await api.put(`/menus/changIsActive/${id}`);
+  return response.data;
+};
 
 export default {
   getMenusByUser,
@@ -56,4 +60,5 @@ export default {
   insertMenu,
   updateMenu,
   deleteMenu,
+  changIsActive,
 };

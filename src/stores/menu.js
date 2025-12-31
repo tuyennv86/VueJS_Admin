@@ -135,6 +135,18 @@ export const useMenuStore = defineStore("menu", () => {
       loading.value = false;
     }
   };
+  const changIsActive = async (id) => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await menuService.changIsActive(id);
+      updateMenuInTree(menus.value, data);
+    } catch (error) {
+      error.value = error.message;
+    } finally {
+      loading.value = false;
+    }
+  };
 
   return {
     menus,
@@ -152,5 +164,6 @@ export const useMenuStore = defineStore("menu", () => {
     insertMenu,
     updateMenu,
     deleteMenu,
+    changIsActive,
   };
 });

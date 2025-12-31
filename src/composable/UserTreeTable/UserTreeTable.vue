@@ -12,27 +12,18 @@
         </thead>
 
         <tbody>
-            <TreeRow v-for="item in data" :key="item.id" :item="item" :level="0" @edit="edit" @remove="remove" />
+            <TreeRow v-for="item in data" :key="item.id" :item="item" :level="0" @edit="emit('edit', $event)"
+                @remove="emit('delete', $event)" @changisActive="emit('changisActive', $event)" />
         </tbody>
     </table>
 </template>
 
 <script setup>
-import TreeRow from './TreeRow.vue'
+import TreeRow from "./TreeRow.vue";
 
 defineProps({
-    data: {
-        type: Array,
-        required: true
-    }
-})
-const emit = defineEmits(['edit', 'delete'])
+    data: Array
+});
 
-const edit = (row) => {
-    emit('edit', row);
-}
-
-const remove = (row) => {
-    emit('delete', row);
-}
+const emit = defineEmits(["edit", "delete", "changisActive"]);
 </script>

@@ -29,7 +29,8 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <UserTreeTable :data="menuStore.menus" @edit="onEdit" @delete="onDelete"></UserTreeTable>
+                <UserTreeTable :data="menuStore.menus" @edit="onEdit" @delete="onDelete"
+                    @changisActive="onChangisActive"></UserTreeTable>
             </div>
         </div>
     </div>
@@ -78,13 +79,10 @@ const getPermission = async () => {
     await permissionStore.getAllPermission();
 }
 const onEdit = (menu) => {
-    // console.log('EDIT MENU:', menu)
     openModal(menu.id);
-    // mở modal sửa
 }
 
 const onDelete = async (menu) => {
-    //console.log('DELETE MENU:', menu)
     if (!confirm("Bạn có chắc XÓA không?")) return;
     try {
         await menuStore.deleteMenu(menu.id);
@@ -94,8 +92,6 @@ const onDelete = async (menu) => {
     }
 }
 const onSave = async ({ form, isEdit }) => {
-    console.log("Edit", isEdit);
-    console.log("Form", form);
     try {
         if (isEdit) {
             await menuStore.updateMenu(form.id, form);
@@ -110,6 +106,9 @@ const onSave = async ({ form, isEdit }) => {
     }
 }
 
+const onChangisActive = async (menu) => {
+    await menuStore.changIsActive(menu.id);
+}
 //
 const loadMenus = async () => {
     await menuStore.getSearch(keyword.value);
@@ -122,28 +121,4 @@ watch(keyword, () => {
 onMounted(async () => {
     await loadMenus();
 });
-
-// const deleteMenu = async (id) => {
-//     confirm.require({
-//         message: 'Bạn có muốn Xóa menu này không?',
-//         header: 'Confirmation',
-//         icon: 'pi pi-exclamation-triangle',
-//         rejectClass: 'p-button-secondary p-button-outlined',
-//         rejectLabel: 'Cancel',
-//         acceptLabel: 'Xóa',
-//         accept: async () => {
-//             try {
-//                 await menuStore.deleteMenu(id);
-//                 toast.add({ severity: 'success', summary: 'Thành công!', detail: 'Đã xóa Menu vừa chọn', life: 3000 });
-//             } catch (err) {
-//                 toast.add({ severity: 'error', summary: 'Lỗi', detail: `Lỗi : ${menuStore.error}`, life: 3000 });
-//             }
-//         }
-//         //,
-//         // reject: () => {            
-//         //     toast.add({ severity: 'error', summary: 'Error Message', detail: 'Message Content', life: 3000 });
-//         // }
-//     });
-// }
-
 </script>
