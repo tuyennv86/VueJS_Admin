@@ -29,8 +29,22 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <UserTreeTable :data="menuStore.menus" @edit="onEdit" @delete="onDelete"
-                    @changisActive="onChangisActive"></UserTreeTable>
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tên menu</th>
+                            <th>Đường dẫn</th>
+                            <th class="text-center">Icon</th>
+                            <th class="text-center">Thứ tự</th>
+                            <th class="text-center">Active</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <TreeRow v-for="item in menuStore.menus" :key="item.id" :item="item" :level="0" @edit="onEdit"
+                            @delete="onDelete" @changisActive="onChangisActive" />
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -47,7 +61,7 @@ import { useMenuStore } from '@/stores/menu';
 import { usePermissionStore } from '@/stores/permission';
 import Notification from '@/composable/Notification.vue';
 import MenuFormDialog from '@/components/admin/page/MenuFormDialog.vue';
-import UserTreeTable from '@/composable/UserTreeTable/UserTreeTable.vue';
+import TreeRow from '@/composable/TreeRow/TreeRow.vue';
 
 
 const menuStore = useMenuStore();
